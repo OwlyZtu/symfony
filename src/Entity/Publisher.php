@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PublisherRepository::class)]
 class Publisher implements JsonSerializable
@@ -18,18 +19,26 @@ class Publisher implements JsonSerializable
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 1, max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $address = null;
 
     #[ORM\Column(length: 15, nullable: true)]
+    #[Assert\Length(max: 15)]
+    #[Assert\Regex(pattern: "/^\+?[0-9]{10,15}$/", message: "Телефонний номер повинен бути вірним")]
     private ?string $phone = null;
 
     /**
      * @var Collection<int, BookPublisher>
      */
     #[ORM\ManyToMany(targetEntity: BookPublisher::class, mappedBy: 'publisher')]
+    #[Assert\NotNull]
+    #[Assert\Count(min: 1)]
     private Collection $bookPublisher;
 
     public function __construct()

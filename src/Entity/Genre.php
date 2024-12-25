@@ -6,6 +6,7 @@ use App\Repository\GenreRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GenreRepository::class)]
 class Genre implements JsonSerializable
@@ -16,9 +17,13 @@ class Genre implements JsonSerializable
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 1, max: 255)]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'genre')]
+    #[Assert\NotNull]
     private ?BookGenre $bookGenre = null;
 
     public function getId(): ?int

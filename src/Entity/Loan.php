@@ -9,6 +9,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: LoanRepository::class)]
 class Loan implements JsonSerializable
@@ -21,22 +23,34 @@ class Loan implements JsonSerializable
     /**
      * @var Collection<int, Reader>
      */
+
     #[ORM\OneToMany(targetEntity: Reader::class, mappedBy: 'Loan')]
+    #[Assert\NotNull]
+    #[Assert\Count(min: 1)]
     private Collection $reader;
 
     /**
      * @var Collection<int, Book>
      */
     #[ORM\OneToMany(targetEntity: Book::class, mappedBy: 'Loan')]
+    #[Assert\NotNull]
+    #[Assert\Count(min: 1)]
     private Collection $book;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\Date]
+    #[Assert\LessThanOrEqual("today")]
     private ?\DateTimeInterface $loan_date = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\Date]
+    #[Assert\GreaterThanOrEqual(propertyPath: "loan_date")]
     private ?\DateTimeInterface $due_date = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\Date]
+    #[Assert\LessThanOrEqual("today")]
+    #[Assert\GreaterThanOrEqual(propertyPath: "loan_date")]
     private ?\DateTimeInterface $return_date = null;
 
     public function __construct()

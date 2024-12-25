@@ -8,9 +8,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
+use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
-class Book
+class Book implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,22 +20,34 @@ class Book
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 1, max: 255)]
     private ?string $title = null;
 
     #[ORM\Column]
+    #[Assert\NotNull]
+    #[Assert\Type(type: "integer")]
     private ?int $author_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $genre = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\Date]
+    #[Assert\LessThanOrEqual("today")]
     private ?\DateTimeInterface $publish_year = null;
 
     #[ORM\Column]
+    #[Assert\NotNull]
+    #[Assert\Type(type: "integer")]
+    #[Assert\Positive]
     private ?int $quantity = null;
 
     #[ORM\ManyToOne(inversedBy: 'Book')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?Author $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'book')]

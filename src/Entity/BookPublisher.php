@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: BookPublisherRepository::class)]
 class BookPublisher implements JsonSerializable
@@ -21,12 +23,16 @@ class BookPublisher implements JsonSerializable
      * @var Collection<int, Book>
      */
     #[ORM\OneToMany(targetEntity: Book::class, mappedBy: 'BookPublisher')]
+    #[Assert\NotNull]
+    #[Assert\Count(min: 1)]
     private Collection $book;
 
     /**
      * @var Collection<int, Publisher>
      */
     #[ORM\ManyToMany(targetEntity: Publisher::class, inversedBy: 'BookPublisher')]
+    #[Assert\NotNull]
+    #[Assert\Count(min: 1)]
     private Collection $publisher;
 
     public function __construct()
