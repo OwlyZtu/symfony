@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Entity\Loan;
+use App\Repository\LoanRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,8 +19,11 @@ class LoanService
      *
      */
     public const REQUIRED_Loan_CREATE_FIELDS = [
-        'name',
-        'description',
+        'readerId',
+        'bookId',
+        'loan_date',
+        'due_date',
+        'return_date'
     ];
 
     /**
@@ -32,28 +38,38 @@ class LoanService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var LoanRepository
+     */
+    private LoanRepository $loanRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param LoanRepository $loanRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        LoanRepository $loanRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->loanRepository = $loanRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getLoan(): array
+    public function getLoan(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Loan::class)->findAll();
+        return $this->loanRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Entity\Publisher;
+use App\Repository\PublisherRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,7 +20,8 @@ class PublisherService
      */
     public const REQUIRED_Publisher_CREATE_FIELDS = [
         'name',
-        'description',
+        'address',
+        'phone'
     ];
 
     /**
@@ -32,28 +36,38 @@ class PublisherService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var PublisherRepository
+     */
+    private PublisherRepository $publisherRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param PublisherRepository $publisherRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        PublisherRepository $publisherRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->publisherRepository = $publisherRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getPublisher(): array
+    public function getPublisher(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Publisher::class)->findAll();
+        return $this->publisherRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

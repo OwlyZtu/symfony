@@ -3,6 +3,10 @@
 namespace App\Services;
 
 use App\Entity\BookPublisher;
+use App\Repository\BookPublisherRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
+use ContainerEiGxgS8\getBookPublisherRepositoryService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,8 +20,8 @@ class BookPublisherService
      *
      */
     public const REQUIRED_BookPublisher_CREATE_FIELDS = [
-        'name',
-        'description',
+        'bookId',
+        'publisherId',
     ];
 
     /**
@@ -32,28 +36,38 @@ class BookPublisherService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var BookPublisherRepository
+     */
+    private BookPublisherRepository $bookPublisherRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param BookPublisherRepository $bookPublisherRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        BookPublisherRepository $bookPublisherRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->bookPublisherRepository = $bookPublisherRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getBookPublisher(): array
+    public function getBookPublisher(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(BookPublisher::class)->findAll();
+        return $this->bookPublisherRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

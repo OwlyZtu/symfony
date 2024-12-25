@@ -29,14 +29,19 @@ class GenreController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Genres', methods: ['GET'])]
-    public function getGenres(): JsonResponse
+    public function getGenres(Request $request): JsonResponse
     {
-        $Genres = $this->GenreService->getGenre();
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        return new JsonResponse($Genres, Response::HTTP_OK);
+        $data = $this->GenreService->getGenre($requestData, $itemsPerPage, $page);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

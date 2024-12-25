@@ -3,6 +3,10 @@
 namespace App\Services;
 
 use App\Entity\Genre;
+use App\Repository\GenreRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
+use ContainerEiGxgS8\getGenreRepositoryService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,7 +21,6 @@ class GenreService
      */
     public const REQUIRED_Genre_CREATE_FIELDS = [
         'name',
-        'description',
     ];
 
     /**
@@ -32,28 +35,38 @@ class GenreService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var GenreRepository
+     */
+    private GenreRepository $genreRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param GenreRepository $genreRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        GenreRepository $genreRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->genreRepository = $genreRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getGenre(): array
+    public function getGenre(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Genre::class)->findAll();
+        return $this->genreRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

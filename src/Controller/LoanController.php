@@ -29,14 +29,19 @@ class LoanController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Loans', methods: ['GET'])]
-    public function getLoans(): JsonResponse
+    public function getLoans(Request $request): JsonResponse
     {
-        $Loans = $this->LoanService->getLoan();
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        return new JsonResponse($Loans, Response::HTTP_OK);
+        $data = $this->LoanService->getLoan($requestData, $itemsPerPage, $page);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

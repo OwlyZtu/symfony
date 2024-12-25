@@ -29,14 +29,19 @@ class BookPublisherController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_BookPublishers', methods: ['GET'])]
-    public function getBookPublishers(): JsonResponse
+    public function getBookPublishers(Request $request): JsonResponse
     {
-        $BookPublishers = $this->BookPublisherService->getBookPublisher();
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        return new JsonResponse($BookPublishers, Response::HTTP_OK);
+        $data = $this->BookPublisherService->getBookPublisher($requestData, $itemsPerPage, $page);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

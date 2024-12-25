@@ -29,14 +29,19 @@ class ReaderController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Readers', methods: ['GET'])]
-    public function getReaders(): JsonResponse
+    public function getReaders(Request $request): JsonResponse
     {
-        $Readers = $this->ReaderService->getReader();
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        return new JsonResponse($Readers, Response::HTTP_OK);
+        $data = $this->ReaderService->getReader($requestData, $itemsPerPage, $page);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

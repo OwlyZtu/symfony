@@ -3,6 +3,10 @@
 namespace App\Services;
 
 use App\Entity\Librarian;
+use App\Repository\LibrarianRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
+use ContainerEiGxgS8\getLibrarianRepositoryService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,7 +21,9 @@ class LibrarianService
      */
     public const REQUIRED_Librarian_CREATE_FIELDS = [
         'name',
-        'description',
+        'email',
+        'phone',
+        'hire_date'
     ];
 
     /**
@@ -32,28 +38,38 @@ class LibrarianService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var LibrarianRepository
+     */
+    private LibrarianRepository $librarianRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param LibrarianRepository $librarianRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        LibrarianRepository $librarianRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->librarianRepository = $librarianRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getLibrarian(): array
+    public function getLibrarian(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Librarian::class)->findAll();
+        return $this->librarianRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

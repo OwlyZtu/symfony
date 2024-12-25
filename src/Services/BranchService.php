@@ -3,6 +3,10 @@
 namespace App\Services;
 
 use App\Entity\Branch;
+use App\Repository\BranchRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
+use ContainerEiGxgS8\getBranchRepositoryService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,7 +21,8 @@ class BranchService
      */
     public const REQUIRED_Branch_CREATE_FIELDS = [
         'name',
-        'description',
+        'address',
+        'phone'
     ];
 
     /**
@@ -32,28 +37,38 @@ class BranchService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var BranchRepository
+     */
+    private BranchRepository $branchRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param BranchRepository $branchRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        BranchRepository $branchRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->branchRepository = $branchRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getBranch(): array
+    public function getBranch(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Branch::class)->findAll();
+        return $this->branchRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Entity\Book;
+use App\Repository\BookRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,8 +19,11 @@ class BookService
      *
      */
     public const REQUIRED_Book_CREATE_FIELDS = [
-        'name',
-        'description',
+        'title',
+        'authorId',
+        'genre',
+        'publish_year',
+        'quantity'
     ];
 
     /**
@@ -32,28 +38,38 @@ class BookService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var BookRepository
+     */
+    private BookRepository $bookRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param BookRepository $bookRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        BookRepository $bookRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->bookRepository = $bookRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getBook(): array
+    public function getBook(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Book::class)->findAll();
+        return $this->bookRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

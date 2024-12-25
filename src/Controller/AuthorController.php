@@ -29,14 +29,19 @@ class AuthorController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Authors', methods: ['GET'])]
-    public function getAuthors(): JsonResponse
+    public function getAuthors(Request $request): JsonResponse
     {
-        $Authors = $this->AuthorService->getAuthor();
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        return new JsonResponse($Authors, Response::HTTP_OK);
+        $data = $this->AuthorService->getAuthor($requestData, $itemsPerPage, $page);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

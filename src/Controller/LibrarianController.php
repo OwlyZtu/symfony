@@ -29,14 +29,19 @@ class LibrarianController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Librarians', methods: ['GET'])]
-    public function getLibrarians(): JsonResponse
+    public function getLibrarians(Request $request): JsonResponse
     {
-        $Librarians = $this->LibrarianService->getLibrarian();
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        return new JsonResponse($Librarians, Response::HTTP_OK);
+        $data = $this->LibrarianService->getLibrarian($requestData, $itemsPerPage, $page);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Entity\Reader;
+use App\Repository\ReaderRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,7 +20,9 @@ class ReaderService
      */
     public const REQUIRED_Reader_CREATE_FIELDS = [
         'name',
-        'description',
+        'email',
+        'phone',
+        'registration_date'
     ];
 
     /**
@@ -32,28 +37,38 @@ class ReaderService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var ReaderRepository
+     */
+    private ReaderRepository $readerRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param ReaderRepository $readerRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        ReaderRepository $readerRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->readerRepository = $readerRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getReader(): array
+    public function getReader(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Reader::class)->findAll();
+        return $this->readerRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

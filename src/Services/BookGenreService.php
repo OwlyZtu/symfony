@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Entity\BookGenre;
+use App\Repository\BookGenreRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,8 +19,8 @@ class BookGenreService
      *
      */
     public const REQUIRED_BookGenre_CREATE_FIELDS = [
-        'name',
-        'description',
+        'bookId',
+        'genreId',
     ];
 
     /**
@@ -32,28 +35,38 @@ class BookGenreService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var BookGenreRepository
+     */
+    private BookGenreRepository $bookGenreRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param BookGenreRepository $bookGenreRepository;
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        BookGenreRepository $bookGenreRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->bookGenreRepository = $bookGenreRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getBookGenre(): array
+    public function getBookGenre(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(BookGenre::class)->findAll();
+        return $this->bookGenreRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

@@ -29,14 +29,19 @@ class PublisherController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Publishers', methods: ['GET'])]
-    public function getPublishers(): JsonResponse
+    public function getPublishers(Request $request): JsonResponse
     {
-        $Publishers = $this->PublisherService->getPublisher();
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        return new JsonResponse($Publishers, Response::HTTP_OK);
+        $data = $this->PublisherService->getPublisher($requestData, $itemsPerPage, $page);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

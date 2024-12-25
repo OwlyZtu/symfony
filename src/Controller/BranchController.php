@@ -29,14 +29,19 @@ class BranchController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
-    #[Route('/', name: 'get_Branchs', methods: ['GET'])]
-    public function getBranchs(): JsonResponse
+    #[Route('/', name: 'get_Branches', methods: ['GET'])]
+    public function getBranches(Request $request): JsonResponse
     {
-        $Branchs = $this->BranchService->getBranch();
+        $requestData = $request->query->all();
+        $itemsPerPage = isset($requestData['itemsPerPage']) ? (int)$requestData['itemsPerPage'] : 10;
+        $page = isset($requestData['page']) ? (int)$requestData['page'] : 1;
 
-        return new JsonResponse($Branchs, Response::HTTP_OK);
+        $data = $this->BranchService->getBranch($requestData, $itemsPerPage, $page);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     /**

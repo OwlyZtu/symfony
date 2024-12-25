@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Entity\Author;
+use App\Repository\AuthorRepository;
+use App\Services\Utils\ObjectHandlerService;
+use App\Services\Utils\RequestCheckerService;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,7 +20,8 @@ class AuthorService
      */
     public const REQUIRED_Author_CREATE_FIELDS = [
         'name',
-        'description',
+        'birth_date',
+        'nationality'
     ];
 
     /**
@@ -32,28 +36,38 @@ class AuthorService
      * @var ObjectHandlerService
      */
     private ObjectHandlerService $objectHandlerService;
+    /**
+     * @var AuthorRepository
+     */
+    private AuthorRepository $authorRepository;
 
     /**
      * @param EntityManagerInterface $entityManager
      * @param RequestCheckerService $requestCheckerService
      * @param ObjectHandlerService $objectHandlerService
+     * @param AuthorRepository $authorRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RequestCheckerService $requestCheckerService,
-        ObjectHandlerService $objectHandlerService
+        ObjectHandlerService $objectHandlerService,
+        AuthorRepository $authorRepository
     ) {
         $this->entityManager = $entityManager;
         $this->requestCheckerService = $requestCheckerService;
         $this->objectHandlerService = $objectHandlerService;
+        $this->authorRepository = $authorRepository;
     }
 
     /**
+     * @param array $filters
+     * @param int $itemsPerPage
+     * @param int $page
      * @return array
      */
-    public function getAuthor(): array
+    public function getAuthor(array $filters, int $itemsPerPage, int $page): array
     {
-        return $this->entityManager->getRepository(Author::class)->findAll();
+        return $this->authorRepository->getAllByFilter($filters, $itemsPerPage, $page);
     }
 
     /**

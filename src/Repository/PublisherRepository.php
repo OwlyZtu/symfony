@@ -3,41 +3,41 @@
 namespace App\Repository;
 
 use App\Entity\Publisher;
+use App\Services\Utils\PaginationService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * @extends ServiceEntityRepository<Publisher>
  */
 class PublisherRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @var PaginationService
+     */
+    private PaginationService $paginationService;
+
+    public function __construct(ManagerRegistry $registry, PaginationService $paginationService)
     {
         parent::__construct($registry, Publisher::class);
+        $this->paginationService = $paginationService;
     }
 
-    //    /**
-    //     * @return Publisher[] Returns an array of Publisher objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    #[ArrayShape([
+        'publisher' => "array",
+        'totalPageCount' => "float",
+        'totalItems' => "int"
+    ])]
+    public function getAllByFilter(array $data, int $itemsPerPage, int $page): array
+    {
+        $queryBuilder = $this->createQueryBuilder('publisher');
 
-    //    public function findOneBySomeField($value): ?Publisher
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if (!empty($data['name'])) {
+            $queryBuilder->andWhere('publisher.title LIKE :name')
+                ->setParameter('name', '%' . $data['name'] . '%');
+        }
+
+        return $this->paginationService->paginate($queryBuilder, $itemsPerPage, $page);
+    }
 }
