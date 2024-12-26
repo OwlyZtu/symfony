@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Action\Book\UpdateBookQuantityAction;
 use App\Repository\BookRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -36,6 +37,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             denormalizationContext: ['groups' => 'patch:item:book']
         ),
         new Delete(),
+        new Patch(
+            uriTemplate: '/book/{id}/update-book-quantity',
+            controller: UpdateBookQuantityAction::class,
+            denormalizationContext: ['groups' => 'patch:item:book'],
+            name: 'update_book_quantity'
+        ),
     ],
 )]
 class Book implements JsonSerializable

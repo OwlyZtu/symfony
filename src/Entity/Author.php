@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Action\Author\UpdateAuthorAction;
 use App\Repository\AuthorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -36,6 +37,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             denormalizationContext: ['groups' => 'patch:item:author']
         ),
         new Delete(),
+        new Patch(
+            uriTemplate: '/author/{id}/update-nationality',
+            controller: UpdateAuthorAction::class,
+            denormalizationContext: ['groups' => 'patch:item:author'],
+            name: 'update_nationality'
+        ),
     ],
 )]
 class Author implements JsonSerializable
