@@ -2,6 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\AuthorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,35 +15,75 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: ['groups' => 'get:item:author']
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => 'get:collection:author']
+        ),
+        new Post(
+            normalizationContext: ['groups' => 'get:item:author'],
+            denormalizationContext: ['groups' => 'post:collection:author']
+        ),
+        new Patch(
+            normalizationContext: ['groups' => 'get:item:author'],
+            denormalizationContext: ['groups' => 'patch:item:author']
+        ),
+        new Delete(),
+    ],
+)]
 class Author implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get:item:author', 'get:collection:author'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(min: 1, max: 255)]
+    #[Groups([
+        'get:item:author',
+        'get:collection:author',
+        'post:collection:author',
+        'patch:item:author'
+    ])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Assert\Date]
     #[Assert\LessThanOrEqual("today")]
+    #[Groups([
+        'get:item:author',
+        'get:collection:author',
+        'post:collection:author',
+        'patch:item:author'
+    ])]
     private ?\DateTimeInterface $birth_date = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Length(max: 255)]
+    #[Groups([
+        'get:item:author',
+        'get:collection:author',
+        'post:collection:author',
+        'patch:item:author'
+    ])]
     private ?string $nationality = null;
 
     /**
      * @var Collection<int, Book>
      */
     #[ORM\OneToMany(targetEntity: Book::class, mappedBy: 'author')]
+    #[Groups(['get:item:author'])]
     private Collection $Book;
 
     public function __construct()
