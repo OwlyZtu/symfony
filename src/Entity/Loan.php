@@ -2,6 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\LoanRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,14 +16,35 @@ use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 
 #[ORM\Entity(repositoryClass: LoanRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: ['groups' => 'get:item:loan']
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => 'get:collection:loan']
+        ),
+        new Post(
+            normalizationContext: ['groups' => 'get:item:loan'],
+            denormalizationContext: ['groups' => 'post:collection:loan']
+        ),
+        new Patch(
+            normalizationContext: ['groups' => 'get:item:loan'],
+            denormalizationContext: ['groups' => 'patch:item:loan']
+        ),
+        new Delete(),
+    ],
+)]
 class Loan implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get:item:loan', 'get:collection:loan'])]
     private ?int $id = null;
 
     /**
@@ -27,6 +54,7 @@ class Loan implements JsonSerializable
     #[ORM\OneToMany(targetEntity: Reader::class, mappedBy: 'Loan')]
     #[Assert\NotNull]
     #[Assert\Count(min: 1)]
+    #[Groups(['get:item:loan'])]
     private Collection $reader;
 
     /**
@@ -35,22 +63,41 @@ class Loan implements JsonSerializable
     #[ORM\OneToMany(targetEntity: Book::class, mappedBy: 'Loan')]
     #[Assert\NotNull]
     #[Assert\Count(min: 1)]
+    #[Groups(['get:item:loan'])]
     private Collection $book;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Assert\Date]
     #[Assert\LessThanOrEqual("today")]
+    #[Groups([
+        'get:item:loan',
+        'get:collection:loan',
+        'post:collection:loan',
+        'patch:item:loan'
+    ])]
     private ?\DateTimeInterface $loan_date = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Assert\Date]
     #[Assert\GreaterThanOrEqual(propertyPath: "loan_date")]
+    #[Groups([
+        'get:item:loan',
+        'get:collection:loan',
+        'post:collection:loan',
+        'patch:item:loan'
+    ])]
     private ?\DateTimeInterface $due_date = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Assert\Date]
     #[Assert\LessThanOrEqual("today")]
     #[Assert\GreaterThanOrEqual(propertyPath: "loan_date")]
+    #[Groups([
+        'get:item:loan',
+        'get:collection:loan',
+        'post:collection:loan',
+        'patch:item:loan'
+    ])]
     private ?\DateTimeInterface $return_date = null;
 
     public function __construct()

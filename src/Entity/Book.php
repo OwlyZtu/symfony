@@ -2,6 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\BookRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,51 +15,120 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: ['groups' => 'get:item:book']
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => 'get:collection:book']
+        ),
+        new Post(
+            normalizationContext: ['groups' => 'get:item:book'],
+            denormalizationContext: ['groups' => 'post:collection:book']
+        ),
+        new Patch(
+            normalizationContext: ['groups' => 'get:item:book'],
+            denormalizationContext: ['groups' => 'patch:item:book']
+        ),
+        new Delete(),
+    ],
+)]
 class Book implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get:item:book', 'get:collection:book'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(min: 1, max: 255)]
+    #[Groups([
+        'get:item:book',
+        'get:collection:book',
+        'post:collection:book',
+        'patch:item:book'
+    ])]
     private ?string $title = null;
 
     #[ORM\Column]
     #[Assert\NotNull]
     #[Assert\Type(type: "integer")]
+    #[Groups([
+        'get:item:book',
+        'get:collection:book',
+        'post:collection:book',
+        'patch:item:book'
+    ])]
     private ?int $author_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Length(max: 255)]
+    #[Groups([
+        'get:item:book',
+        'get:collection:book',
+        'post:collection:book',
+        'patch:item:book'
+    ])]
     private ?string $genre = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Assert\Date]
     #[Assert\LessThanOrEqual("today")]
+    #[Groups([
+        'get:item:book',
+        'get:collection:book',
+        'post:collection:book',
+        'patch:item:book'
+    ])]
     private ?\DateTimeInterface $publish_year = null;
 
     #[ORM\Column]
     #[Assert\NotNull]
     #[Assert\Type(type: "integer")]
     #[Assert\Positive]
+    #[Groups([
+        'get:item:book',
+        'get:collection:book',
+        'post:collection:book',
+        'patch:item:book'
+    ])]
     private ?int $quantity = null;
 
     #[ORM\ManyToOne(inversedBy: 'Book')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull]
+    #[Groups([
+        'get:item:book',
+        'get:collection:book',
+        'post:collection:book',
+        'patch:item:book'
+    ])]
     private ?Author $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'book')]
+    #[Groups([
+        'get:item:book',
+        'get:collection:book',
+        'post:collection:book',
+        'patch:item:book'
+    ])]
     private ?Loan $Loan = null;
 
     #[ORM\ManyToOne(inversedBy: 'book')]
+    #[Groups([
+        'get:item:book',
+        'get:collection:book',
+        'post:collection:book',
+        'patch:item:book'
+    ])]
     private ?BookPublisher $BookPublisher = null;
 
     /**

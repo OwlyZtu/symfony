@@ -2,21 +2,49 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\BookPublisherRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: BookPublisherRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: ['groups' => 'get:item:bookPublisher']
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => 'get:collection:bookPublisher']
+        ),
+        new Post(
+            normalizationContext: ['groups' => 'get:item:bookPublisher'],
+            denormalizationContext: ['groups' => 'post:collection:bookPublisher']
+        ),
+        new Patch(
+            normalizationContext: ['groups' => 'get:item:bookPublisher'],
+            denormalizationContext: ['groups' => 'patch:item:bookPublisher']
+        ),
+        new Delete(),
+    ],
+)]
+
 class BookPublisher implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get:item:bookPublisher', 'get:collection:bookPublisher'])]
     private ?int $id = null;
 
     /**
@@ -25,6 +53,12 @@ class BookPublisher implements JsonSerializable
     #[ORM\OneToMany(targetEntity: Book::class, mappedBy: 'BookPublisher')]
     #[Assert\NotNull]
     #[Assert\Count(min: 1)]
+    #[Groups([
+        'get:item:bookPublisher',
+        'get:collection:bookPublisher',
+        'post:collection:bookPublisher',
+        'patch:item:bookPublisher'
+    ])]
     private Collection $book;
 
     /**
@@ -33,6 +67,7 @@ class BookPublisher implements JsonSerializable
     #[ORM\ManyToMany(targetEntity: Publisher::class, inversedBy: 'BookPublisher')]
     #[Assert\NotNull]
     #[Assert\Count(min: 1)]
+    #[Groups(['get:item:bookPublisher', 'get:collection:bookPublisher'])]
     private Collection $publisher;
 
     public function __construct()
