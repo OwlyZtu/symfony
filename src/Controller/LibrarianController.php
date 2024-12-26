@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  *
@@ -33,6 +34,7 @@ class LibrarianController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Librarians', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getLibrarians(Request $request): JsonResponse
     {
         $requestData = $request->query->all();
@@ -49,6 +51,7 @@ class LibrarianController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'get_Librarian', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getLibrarian(int $id): JsonResponse
     {
         $Librarian = $this->LibrarianService->getLibrarianById($id);
@@ -62,6 +65,7 @@ class LibrarianController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'create_Librarian', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function createLibrarian(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -79,6 +83,7 @@ class LibrarianController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/{id}', name: 'update_Librarian', methods: ['PATCH'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function updateLibrarian(Request $request, int $id): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -93,6 +98,7 @@ class LibrarianController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'delete_Librarian', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function deleteLibrarian(int $id): JsonResponse
     {
         $this->LibrarianService->deleteLibrarian($id);

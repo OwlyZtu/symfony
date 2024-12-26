@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  *
@@ -33,6 +34,7 @@ class GenreController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Genres', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getGenres(Request $request): JsonResponse
     {
         $requestData = $request->query->all();
@@ -49,6 +51,7 @@ class GenreController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'get_Genre', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getGenre(int $id): JsonResponse
     {
         $Genre = $this->GenreService->getGenreById($id);
@@ -62,6 +65,7 @@ class GenreController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'create_Genre', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function createGenre(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -79,6 +83,7 @@ class GenreController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/{id}', name: 'update_Genre', methods: ['PATCH'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function updateGenre(Request $request, int $id): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -93,6 +98,7 @@ class GenreController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'delete_Genre', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function deleteGenre(int $id): JsonResponse
     {
         $this->GenreService->deleteGenre($id);

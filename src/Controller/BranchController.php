@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  *
@@ -33,6 +34,7 @@ class BranchController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Branches', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getBranches(Request $request): JsonResponse
     {
         $requestData = $request->query->all();
@@ -49,6 +51,7 @@ class BranchController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'get_Branch', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getBranch(int $id): JsonResponse
     {
         $Branch = $this->BranchService->getBranchById($id);
@@ -62,6 +65,7 @@ class BranchController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'create_Branch', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function createBranch(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -79,6 +83,7 @@ class BranchController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/{id}', name: 'update_Branch', methods: ['PATCH'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function updateBranch(Request $request, int $id): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -93,6 +98,7 @@ class BranchController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'delete_Branch', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function deleteBranch(int $id): JsonResponse
     {
         $this->BranchService->deleteBranch($id);

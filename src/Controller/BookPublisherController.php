@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  *
@@ -33,6 +34,7 @@ class BookPublisherController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/', name: 'get_BookPublishers', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getBookPublishers(Request $request): JsonResponse
     {
         $requestData = $request->query->all();
@@ -49,6 +51,7 @@ class BookPublisherController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'get_BookPublisher', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getBookPublisher(int $id): JsonResponse
     {
         $BookPublisher = $this->BookPublisherService->getBookPublisherById($id);
@@ -62,6 +65,7 @@ class BookPublisherController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'create_BookPublisher', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function createBookPublisher(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -79,6 +83,7 @@ class BookPublisherController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/{id}', name: 'update_BookPublisher', methods: ['PATCH'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function updateBookPublisher(Request $request, int $id): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -93,6 +98,7 @@ class BookPublisherController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'delete_BookPublisher', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function deleteBookPublisher(int $id): JsonResponse
     {
         $this->BookPublisherService->deleteBookPublisher($id);

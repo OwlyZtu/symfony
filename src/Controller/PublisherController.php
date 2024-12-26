@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  *
@@ -33,6 +34,7 @@ class PublisherController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Publishers', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getPublishers(Request $request): JsonResponse
     {
         $requestData = $request->query->all();
@@ -49,6 +51,7 @@ class PublisherController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'get_Publisher', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getPublisher(int $id): JsonResponse
     {
         $Publisher = $this->PublisherService->getPublisherById($id);
@@ -62,6 +65,7 @@ class PublisherController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'create_Publisher', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function createPublisher(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -79,6 +83,7 @@ class PublisherController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/{id}', name: 'update_Publisher', methods: ['PATCH'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function updatePublisher(Request $request, int $id): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -93,6 +98,7 @@ class PublisherController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'delete_Publisher', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function deletePublisher(int $id): JsonResponse
     {
         $this->PublisherService->deletePublisher($id);

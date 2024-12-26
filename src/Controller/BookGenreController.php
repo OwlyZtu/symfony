@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  *
@@ -32,6 +33,7 @@ class BookGenreController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/', name: 'get_BookGenres', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getBookGenres(): JsonResponse
     {
         $BookGenres = $this->BookGenreService->getBookGenre();
@@ -44,6 +46,7 @@ class BookGenreController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'get_BookGenre', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getBookGenre(int $id): JsonResponse
     {
         $BookGenre = $this->BookGenreService->getBookGenreById($id);
@@ -57,6 +60,7 @@ class BookGenreController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'create_BookGenre', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function createBookGenre(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -74,6 +78,7 @@ class BookGenreController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/{id}', name: 'update_BookGenre', methods: ['PATCH'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function updateBookGenre(Request $request, int $id): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -88,6 +93,7 @@ class BookGenreController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'delete_BookGenre', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function deleteBookGenre(int $id): JsonResponse
     {
         $this->BookGenreService->deleteBookGenre($id);

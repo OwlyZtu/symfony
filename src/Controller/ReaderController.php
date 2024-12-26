@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  *
@@ -33,6 +34,7 @@ class ReaderController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/', name: 'get_Readers', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getReaders(Request $request): JsonResponse
     {
         $requestData = $request->query->all();
@@ -49,6 +51,7 @@ class ReaderController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'get_Reader', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getReader(int $id): JsonResponse
     {
         $Reader = $this->ReaderService->getReaderById($id);
@@ -62,6 +65,7 @@ class ReaderController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'create_Reader', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function createReader(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -79,6 +83,7 @@ class ReaderController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/{id}', name: 'update_Reader', methods: ['PATCH'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function updateReader(Request $request, int $id): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -93,6 +98,7 @@ class ReaderController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/{id}', name: 'delete_Reader', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function deleteReader(int $id): JsonResponse
     {
         $this->ReaderService->deleteReader($id);
